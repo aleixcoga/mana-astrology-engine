@@ -8,8 +8,29 @@ import swisseph as swe
 
 ENGINE_VERSION = "v3-stable-robust"
 
-EPHE_PATH = os.getenv("EPHE_PATH") or os.path.join(os.path.dirname(__file__), "ephe")
+EPHE_CANDIDATES = [
+    os.getenv("EPHE_PATH"),
+    os.path.join(os.path.dirname(__file__), "ephe"),  # junto a astrology.py
+    "/app/ephe",
+    "/app/app/ephe",
+    "/opt/render/project/src/app/ephe",
+]
+
+def pick_ephe_path():
+    for p in EPHE_CANDIDATES:
+        if not p:
+            continue
+        if os.path.exists(os.path.join(p, "seas_18.se1")):
+            return p
+    # fallback: usa el primero existente aunque falte seas_18 (para planetas)
+    for p in EPHE_CANDIDATES:
+        if p and os.path.isdir(p):
+            return p
+    return os.path.join(os.path.dirname(__file__), "ephe")
+
+EPHE_PATH = pick_ephe_path()
 swe.set_ephe_path(EPHE_PATH)
+print(f"[ephe] using={EPHE_PATH} seas_18={os.path.exists(os.path.join(EPHE_PATH,'seas_18.se1'))}")
 
 HOUSE_SYS_MAP = {
     "Placidus": b"P",
@@ -220,4 +241,5 @@ def calculate_chart(
         "flags": flags,
         "warnings": warnings
     }
+
 
