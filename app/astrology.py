@@ -8,7 +8,7 @@ import swisseph as swe
 
 ENGINE_VERSION = "v3-stable-robust"
 
-EPHE_PATH = os.getenv("EPHE_PATH", "/app/ephe")
+EPHE_PATH = os.getenv("EPHE_PATH") or os.path.join(os.path.dirname(__file__), "ephe")
 swe.set_ephe_path(EPHE_PATH)
 
 HOUSE_SYS_MAP = {
@@ -220,3 +220,4 @@ def calculate_chart(
         "flags": flags,
         "warnings": warnings
     }
+
