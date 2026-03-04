@@ -28,9 +28,23 @@ def pick_ephe_path():
             return p
     return os.path.join(os.path.dirname(__file__), "ephe")
 
-EPHE_PATH = pick_ephe_path()
+import os
+import swisseph as swe
+
+ENV_EPHE = os.getenv("EPHE_PATH")
+LOCAL_EPHE = os.path.join(os.path.dirname(__file__), "ephe")  # app/ephe
+
+def has_seas18(p: str) -> bool:
+    return bool(p) and os.path.exists(os.path.join(p, "seas_18.se1"))
+
+EPHE_PATH = ENV_EPHE if has_seas18(ENV_EPHE) else LOCAL_EPHE
 swe.set_ephe_path(EPHE_PATH)
-print(f"[ephe] using={EPHE_PATH} seas_18={os.path.exists(os.path.join(EPHE_PATH,'seas_18.se1'))}")
+
+print(
+    f"[ephe] using={EPHE_PATH} seas_18={os.path.exists(os.path.join(EPHE_PATH,'seas_18.se1'))} "
+    f"dir_exists={os.path.isdir(EPHE_PATH)}",
+    flush=True
+)
 
 HOUSE_SYS_MAP = {
     "Placidus": b"P",
@@ -241,5 +255,6 @@ def calculate_chart(
         "flags": flags,
         "warnings": warnings
     }
+
 
 
